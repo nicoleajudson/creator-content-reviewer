@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Creator Content Reviewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.cdnfonts.com/css/glacial-indifference-2" rel="stylesheet" />
+<style>
+  :root {
+    --charcoal: #2f2b25;
+    --muted: #7c7462;
+    --cream: #f6f0e2;
+    --beige: #ece3d0;
+    --line: #ddd2bb;
+    --green: #6d6d4e;
+    --good: #5f7a34;
+    --warn: #b2863a;
+    --fix: #2f2b25;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Glacial Indifference', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--charcoal);
+    line-height: 1.55;
+    padding: 44px 16px;
+    min-height: 100vh;
+    background-color: var(--green);
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='140'%20height='140'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'%20opacity='0.10'/%3E%3C/svg%3E");
+  }
+  h1, h2, h3, h4, .num, .serif {
+    font-family: 'Playfair Display', Georgia, "Times New Roman", serif;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 34px; margin: 0 0 6px; color: var(--cream); font-weight: 700; letter-spacing: .2px; }
+  .sub { color: #e8e1cd; font-size: 15px; margin: 0 0 26px; max-width: 600px; }
+  .card {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 18px 50px rgba(40, 36, 24, 0.22);
+  }
+  .step { margin-bottom: 22px; }
+  .step-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+  .num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--charcoal); color: var(--cream);
+    font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-head h3 { font-size: 18px; margin: 0; font-weight: 600; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 0 0 8px 39px; }
+  .field { margin-left: 39px; }
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 11px 13px;
+    background: #fffdf7;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--charcoal);
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea { min-height: 84px; }
+  textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--green); }
+  .upload { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .upload input { font-size: 12px; }
+
+  .agentwrap { margin: 6px 0 0 39px; }
+  .agentwrap .tag {
+    font-size: 11px; font-weight: 700; color: var(--green);
+    text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 7px;
+    font-family: 'Glacial Indifference', sans-serif;
+  }
+  #instr {
+    width: 100%; min-height: 96px;
+    background: var(--beige);
+    border: 1px dashed var(--green);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13.5px; color: #39342a;
+    font-family: inherit; resize: vertical;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 15px;
+    background: var(--charcoal);
+    color: var(--cream);
+    border: 0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    cursor: pointer;
+    font-family: 'Glacial Indifference', sans-serif;
+  }
+  button:hover { background: #46402f; }
+  button:disabled { opacity: .6; cursor: default; }
+
+  .output { margin-top: 26px; display: none; }
+  .output.show { display: block; }
+  .banner {
+    font-size: 12px; color: #5d553f;
+    background: var(--beige); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 13px; margin-bottom: 16px;
+  }
+  .fb { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fffdf7; }
+  .fb-sec { padding: 16px 18px; border-top: 1px solid var(--line); }
+  .fb-sec:first-child { border-top: 0; }
+  .fb-sec h4 { margin: 0 0 9px; font-size: 17px; display: flex; align-items: center; gap: 9px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .dot.good { background: var(--good); }
+  .dot.warn { background: var(--warn); }
+  .dot.fix { background: var(--fix); }
+  .fb-sec ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: #3a3428; }
+  .fb-sec li { margin-bottom: 6px; }
+  .note { color: #6b6350; font-size: 12px; margin-top: 18px; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Creator Content Reviewer</h1>
+    <p class="sub">An AI agent that reads creator content against your brand guidelines and campaign brief, then tells you what's working, what to fix, and how to revise, before anything goes live.</p>
+
+    <div class="card">
+      <div class="step">
+        <div class="step-head"><span class="num">1</span><h3>Brand guidelines</h3></div>
+        <p class="hint">Paste your brand and style guidelines: tone, voice, do's and don'ts, naming conventions.</p>
+        <div class="field">
+          <textarea id="guidelines" placeholder="e.g. Friendly and expert, never salesy. Always capitalize product names. Use the official event name, never an unapproved variation. No competitor mentions."></textarea>
+          <div class="upload">or upload a .txt / .md file: <input type="file" id="guidelinesFile" accept=".txt,.md,.markdown" /></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="num">2</span><h3>Campaign brief</h3></div>
+        <p class="hint">Paste the brief: objectives, key messages, product references, and what's off-limits before launch.</p>
+        <div class="field">
+          <textarea id="brief" placeholder="Objectives, key talking points, required hashtags and disclosures, links, and anything embargoed until the announcement."></textarea>
+          <div class="upload">or upload a .txt / .md file: <input type="file" id="briefFile" accept=".txt,.md,.markdown" /></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="num">3</span><h3>Any additional information to add?</h3></div>
+        <p class="hint">Optional. Anything else the reviewer should know for this specific creator or post.</p>
+        <div class="field">
+          <textarea id="extra" placeholder="e.g. This creator's audience skews technical, keep the CTA soft. Post goes live Tuesday."></textarea>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="num">4</span><h3>Campaign name</h3></div>
+        <div class="field">
+          <input type="text" id="campaign" placeholder="e.g. Q2 Innovation Moment" />
+        </div>
+      </div>
+
+      <div class="agentwrap">
+        <span class="tag">Agent instructions (editable)</span>
+        <textarea id="instr">Review creator content as part of the XYZ campaign, and provide feedback based on the brand guidelines, brief, and other details I've shared. Tell me what's working, what needs to be improved, and suggestions for how to revise.</textarea>
+      </div>
+
+      <div class="step" style="margin-top:22px;">
+        <div class="step-head"><span class="num">5</span><h3>Creator content</h3></div>
+        <p class="hint">Drop the link to the creator's Google Doc. The agent opens it and reviews the content directly.</p>
+        <div class="field">
+          <input type="text" id="doclink" placeholder="https://docs.google.com/document/d/..." />
+        </div>
+      </div>
+
+      <button id="reviewBtn" onclick="review()">Review</button>
+
+      <div id="output" class="output">
+        <div class="banner">Prototype preview. This demo shows the review flow and a representative output. The production version runs on Claude Cowork and reviews the linked document directly.</div>
+        <div class="fb" id="feedback"></div>
+      </div>
+
+      <p class="note">Built by Nicole Judson. Sample content is illustrative and contains no proprietary data.</p>
+    </div>
+  </div>
+
+<script>
+  // Editable agent instructions, with "XYZ" auto-swapped to the campaign name.
+  var campaignInput = document.getElementById("campaign");
+  var instr = document.getElementById("instr");
+  var lastToken = "XYZ";
+  campaignInput.addEventListener("input", function () {
+    var next = campaignInput.value.trim() || "XYZ";
+    if (next === lastToken) return;
+    instr.value = instr.value.split(lastToken).join(next);
+    lastToken = next;
+  });
+
+  // File-to-textarea readers (text files only).
+  function wireUpload(fileId, areaId) {
+    document.getElementById(fileId).addEventListener("change", function (e) {
+      var f = e.target.files[0];
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function () { document.getElementById(areaId).value = r.result; };
+      r.readAsText(f);
+    });
+  }
+  wireUpload("guidelinesFile", "guidelines");
+  wireUpload("briefFile", "brief");
+
+  function review() {
+    var btn = document.getElementById("reviewBtn");
+    btn.disabled = true;
+    btn.textContent = "Reviewing content...";
+
+    setTimeout(function () {
+      var working = [
+        "Opens in the creator's own voice, which keeps it authentic and on-brand.",
+        "Hits the campaign's core message clearly within the first few lines.",
+        "Call to action is present and points to the correct link."
+      ];
+      var improve = [
+        "Product name casing is inconsistent with the brand guidelines in two places.",
+        "One claim goes beyond what the brief approves and should be softened or cut.",
+        "The required disclosure (#ad or paid partnership tag) is missing."
+      ];
+      var revise = [
+        "Match the approved product and event naming exactly as defined in the guidelines.",
+        "Reframe the out-of-scope claim to the approved talking point from the brief.",
+        "Add the disclosure at the top of the caption, and confirm nothing embargoed appears before the launch date.",
+        "Keep the creator's voice as-is. The structure and hook are strong and should not be over-edited."
+      ];
+
+      var html =
+        '<div class="fb-sec"><h4><span class="dot good"></span>What\'s working</h4><ul>' +
+          working.map(function (x) { return "<li>" + x + "</li>"; }).join("") +
+        '</ul></div>' +
+        '<div class="fb-sec"><h4><span class="dot warn"></span>What needs improvement</h4><ul>' +
+          improve.map(function (x) { return "<li>" + x + "</li>"; }).join("") +
+        '</ul></div>' +
+        '<div class="fb-sec"><h4><span class="dot fix"></span>Suggestions to revise</h4><ul>' +
+          revise.map(function (x) { return "<li>" + x + "</li>"; }).join("") +
+        '</ul></div>';
+
+      document.getElementById("feedback").innerHTML = html;
+      document.getElementById("output").classList.add("show");
+      btn.disabled = false;
+      btn.textContent = "Review";
+    }, 700);
+  }
+</script>
+</body>
+</html>
